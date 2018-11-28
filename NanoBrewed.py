@@ -226,6 +226,7 @@ def raw_to_nano(amount):
 beer_list = {
     1: {
         "Tap Number": 1,
+        "Valve Number": 1,
         "Name": "Dantoberfest",
         "Style": "Mocktoberfest Ale",
         "IBU": 22,
@@ -243,7 +244,8 @@ beer_list = {
 
     },
     2: {
-        "Tap Number": 2,
+        "Tap Number": 1,
+        "Valve Number": 2,
         "Name": "Moving Day",
         "Style": "Barleywine",
         "IBU": 40,
@@ -260,7 +262,8 @@ beer_list = {
         "BG_Color": (.1, .1, .7, .8)
     },
     3: {
-        "Tap Number": 3,
+        "Tap Number": 2,
+        "Valve Number": 3,
         "Name": "Snuggle\nWith Otis",
         "Style": "Winter Warmer",
         "IBU": 25,
@@ -275,7 +278,8 @@ beer_list = {
         "BG_Color": (.2, 0, .4, .3)
     },
     4: {
-    "Tap Number": 4,
+        "Tap Number": 2,
+        "Valve Number": 4,
         "Name": "End of an Era",
         "Style": "Specialty Barleywine",
         "IBU": 50,
@@ -312,6 +316,7 @@ callback_test_time = .1
 payment = False
 t0 = 0
 times=[]
+
 
 class LoginScreen(GridLayout):
     def __init__(self, **kwargs):
