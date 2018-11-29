@@ -46,7 +46,7 @@ def perform_curl(data=None, URL=None):
 def SendBlock(origin, key, amount, destination, rep=None):
     balance = check_balance(origin)[0]
     balance = int(balance - amount)
-    previous = GetPreviousHash(origin)
+    previous = get_previous_hash(origin)
     print(balance)
     if rep is None:
         rep = "xrb_1brainb3zz81wmhxndsbrjb94hx3fhr1fyydmg6iresyk76f3k7y7jiazoji"
@@ -64,7 +64,7 @@ def SendBlock(origin, key, amount, destination, rep=None):
     return results
 
 
-def OpenBlock(account, key, rep=None):
+def open_block(account, key, rep=None):
     """
 
     :param account: str account to open
@@ -74,10 +74,10 @@ def OpenBlock(account, key, rep=None):
     """
     if rep is None:
         rep = "xrb_1brainb3zz81wmhxndsbrjb94hx3fhr1fyydmg6iresyk76f3k7y7jiazoji"
-    sent_hash = GetPending(account)["blocks"][0]
-    sent_block = GetBlockByHash(sent_hash)
+    sent_hash = get_pending(account)["blocks"][0]
+    sent_block = get_block_by_hash(sent_hash)
     sent_previous_hash = sent_block['previous']
-    sent_previous_block = GetBlockByHash(sent_previous_hash)
+    sent_previous_block = get_block_by_hash(sent_previous_hash)
     amount = (int(sent_previous_block['balance']) - int(sent_block['balance']))
     data = {
         'action': 'block_create',
@@ -102,10 +102,10 @@ def ReceiveBlock(account, key, sent_hash, rep=None):
     """
     if rep is None:
         rep = "xrb_1brainb3zz81wmhxndsbrjb94hx3fhr1fyydmg6iresyk76f3k7y7jiazoji"
-    previous = GetPreviousHash(account)
-    sent_block = GetBlockByHash(sent_hash)
+    previous = get_previous_hash(account)
+    sent_block = get_block_by_hash(sent_hash)
     sent_previous_hash = sent_block['previous']
-    sent_previous_block = GetBlockByHash(sent_previous_hash)
+    sent_previous_block = get_block_by_hash(sent_previous_hash)
     amount = (int(sent_previous_block['balance']) - int(sent_block['balance']))
     amount = check_balance(account)[0] + amount
     print(amount)
@@ -127,26 +127,26 @@ def Send(*argv):
     """
     origin, key, amount, destination, rep=None
     """
-    results = ProcessBlock(SendBlock(*argv))
+    results = process_block(SendBlock(*argv))
     return results
 
 
-def Open(*argv):
+def open(*argv):
     """
     account, key, rep=None
     """
-    results = ProcessBlock(OpenBlock(*argv))
+    results = process_block(open_block(*argv))
     return results
 
 
 def ReceiveAll(account, key, rep=None):
     hashes = []
-    sent_hashes = GetPending(account)["blocks"]
+    sent_hashes = get_pending(account)["blocks"]
     if len(sent_hashes) < 1:
         return "No Pending Transactions."
     else:
         for sent_hash in sent_hashes:
-            results = ProcessBlock(ReceiveBlock(account, key, sent_hash, rep))
+            results = process_block(ReceiveBlock(account, key, sent_hash, rep))
             hashes.append(results)
     return hashes
 
@@ -168,7 +168,7 @@ def generate_account():
     return (perform_curl(data))
 
 
-def GetPreviousHash(account):
+def get_previous_hash(account):
     data = {
         "action": "account_history",
         "account": account,
@@ -178,7 +178,7 @@ def GetPreviousHash(account):
     return results['history'][0]['hash']
 
 
-def GetBlockByHash(hash):
+def get_block_by_hash(hash):
     data = {
         "action": "block",
         "hash": hash
@@ -187,7 +187,7 @@ def GetBlockByHash(hash):
     return json.loads(results['contents'])
 
 
-def GetPending(account):
+def get_pending(account):
     data = {
         "action": "pending",
         "account": account,
@@ -209,7 +209,7 @@ def generate_qr(account, amount=0):
     return img
 
 
-def ProcessBlock(block):
+def process_block(block):
     data = {"action": "process"}
     data["block"] = block['block']
     return perform_curl(data)
