@@ -43,7 +43,7 @@ def perform_curl(data=None, URL=None):
     return results
 
 
-def SendBlock(origin, key, amount, destination, rep=None):
+def send_block(origin, key, amount, destination, rep=None):
     balance = check_balance(origin)[0]
     balance = int(balance - amount)
     previous = get_previous_hash(origin)
@@ -93,7 +93,7 @@ def open_block(account, key, rep=None):
     return results
 
 
-def ReceiveBlock(account, key, sent_hash, rep=None):
+def receive_block(account, key, sent_hash, rep=None):
     """
     :param account: str account to open
     :param key: str account private key
@@ -123,11 +123,11 @@ def ReceiveBlock(account, key, sent_hash, rep=None):
     return results
 
 
-def Send(*argv):
+def send(*argv):
     """
     origin, key, amount, destination, rep=None
     """
-    results = process_block(SendBlock(*argv))
+    results = process_block(send_block(*argv))
     return results
 
 
@@ -139,14 +139,14 @@ def open(*argv):
     return results
 
 
-def ReceiveAll(account, key, rep=None):
+def receive_all(account, key, rep=None):
     hashes = []
     sent_hashes = get_pending(account)["blocks"]
     if len(sent_hashes) < 1:
         return "No Pending Transactions."
     else:
         for sent_hash in sent_hashes:
-            results = process_block(ReceiveBlock(account, key, sent_hash, rep))
+            results = process_block(receive_block(account, key, sent_hash, rep))
             hashes.append(results)
     return hashes
 
