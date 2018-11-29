@@ -18,19 +18,12 @@ from io import BytesIO
 from kivy.config import Config
 from rpc_bindings import send, open_account, generate_account, generate_qr, nano_to_raw, receive_all, send_all, check_balance
 
-
-#new_hash = open_account('xrb_3ofr7e8uqtbgh8jokqeaxi8kmwbpwrqb3tdzexatzb9oboyexao1adid9cri', '48663DEE837E85D45E83186D9C2372E0605D7CB21CC0BB4398627CD2CD04D47C')
-#print(new_hash)
-#exit()
-
-# print(receive_all('xrb_1pkoobrffkzcwmdes78r64xg5t5ajcj3ruduwx3bpooj5f8tq4t3ek6tzbet', 'E09D5194DBAE486CCA8196FC5855C0F77F8650B5B9932ECE74662CD905F6B978'))
-
-#exit()
+# this file will contain your account name. I left it intentionally missing from the repo
 with open('my_account.txt') as f:
     for line in f:
         my_account = line
 
-
+# houses the transaction history from the kivy app. It's crude and unencrypted.
 with open('transaction_history.txt', 'r') as f:
     accounts = []
     keys = []
@@ -41,7 +34,7 @@ with open('transaction_history.txt', 'r') as f:
         else:
             keys.append(line.replace(' ', '').replace('\n', ''))
 
-
+# open accounts or receive from transaction history
 for account, key in zip(accounts, keys):
     try:
         hash = open_account(account, key)
@@ -60,7 +53,7 @@ for account, key in zip(accounts, keys):
         # print('nothing to receive for %s' % account)
         pass
 
-
+# send all nanos back to your wallet in 'my_account.txt'
 for account, key in zip(accounts, keys):
     try:
         sent = send_all(account, key, my_account)
@@ -72,7 +65,9 @@ for account, key in zip(accounts, keys):
         pass
         #print('nothing to send for %s' % account)
 
-
+# the beers. has beer information and keg information
+# the tap number will determine which flow_meter to use
+# the valve number controls whichever valve
 beer_list = {
     1: {
         "Tap Number": 1,
@@ -146,7 +141,14 @@ beer_list = {
 
 }
 
+# do we want to accept payment?
+payment = False
+
+# config for hte kivy app. If it's not on the raspberry pi, don't activate GPIO, and use a timer to simulate the
+# flowmeter
 flow_meter_channel = 4
+
+# when the flow meter is being monitored, it is looking for a chance from True to False for a 'click'
 flow_pin_was_on = False
 try:
     import RPi.GPIO as GPIO
@@ -163,7 +165,7 @@ Config.set('graphics', 'height', 480)
 
 flow_meter = 0
 callback_test_time = .1
-payment = True
+
 t0 = 0
 times = []
 
@@ -173,13 +175,18 @@ class LoginScreen(GridLayout):
         #self.size = (800, 480)
         global beer_list
         global flow_meter
+        global flow_pin_was_on
+        flow_pin_was_on = False
         flow_meter = 0
         super(LoginScreen, self).__init__(**kwargs)
         self.clear_widgets(self.children)
         self.cols = 2
 
         tap_num = 1
-        btn1 = Button(background_normal='', markup=True, halign='center', background_color=beer_list[tap_num]['BG_Color'],
+        btn1 = Button(background_normal='',
+                      markup=True,
+                      halign='center',
+                      background_color=beer_list[tap_num]['BG_Color'],
                       text="[size=60]" + beer_list[tap_num]['Name'] +'[/size]\n' +
                             '[size=25]' + beer_list[tap_num]['Style'] + '\n' +
                            'ABV: %s%% | IBU: %s' % (beer_list[tap_num]['ABV'], beer_list[tap_num]['IBU']) +'[/size]'
@@ -188,7 +195,10 @@ class LoginScreen(GridLayout):
         btn1.bind(on_release=self.BeerDescript)
 
         tap_num = 2
-        btn2 = Button(background_normal='', markup=True, halign='center', background_color=beer_list[tap_num]['BG_Color'],
+        btn2 = Button(background_normal='',
+                      markup=True,
+                      halign='center',
+                      background_color=beer_list[tap_num]['BG_Color'],
                       text="[size=60]" + beer_list[tap_num]['Name'] +'[/size]\n' +
                             '[size=25]' + beer_list[tap_num]['Style'] + '\n' +
                            'ABV: %s%% | IBU: %s' % (beer_list[tap_num]['ABV'], beer_list[tap_num]['IBU']) +'[/size]'
@@ -197,7 +207,10 @@ class LoginScreen(GridLayout):
         btn2.bind(on_release=self.BeerDescript)
 
         tap_num = 3
-        btn3 = Button(background_normal='', markup=True, halign='center', background_color=beer_list[tap_num]['BG_Color'],
+        btn3 = Button(background_normal='',
+                      markup=True,
+                      halign='center',
+                      background_color=beer_list[tap_num]['BG_Color'],
                       text="[size=60]" + beer_list[tap_num]['Name'] +'[/size]\n' +
                             '[size=25]' + beer_list[tap_num]['Style'] + '\n' +
                            'ABV: %s%% | IBU: %s' % (beer_list[tap_num]['ABV'], beer_list[tap_num]['IBU']) +'[/size]'
@@ -206,7 +219,10 @@ class LoginScreen(GridLayout):
         btn3.bind(on_release=self.BeerDescript)
 
         tap_num = 4
-        btn4 = Button(background_normal='', markup=True, halign='center', background_color=beer_list[tap_num]['BG_Color'],
+        btn4 = Button(background_normal='',
+                      markup=True,
+                      halign='center',
+                      background_color=beer_list[tap_num]['BG_Color'],
                       text="[size=60]" + beer_list[tap_num]['Name'] +'[/size]\n' +
                             '[size=25]' + beer_list[tap_num]['Style'] + '\n' +
                            'ABV: %s%% | IBU: %s' % (beer_list[tap_num]['ABV'], beer_list[tap_num]['IBU']) +'[/size]'
@@ -218,6 +234,9 @@ class LoginScreen(GridLayout):
         self.add_widget(btn2)
         self.add_widget(btn3)
         self.add_widget(btn4)
+
+    def MainMenu(self, value):
+        self.__init__()
 
     def BeerDescript(self, value):
         self.cols = 2
@@ -252,9 +271,6 @@ class LoginScreen(GridLayout):
 
         self.add_widget(left_float)
         #self.add_widget(right_float)
-
-    def MainMenu(self, value):
-        self.__init__()
 
     def BuyBeer(self, value):
         global payment
@@ -371,21 +387,6 @@ class LoginScreen(GridLayout):
     def update_label(self, label, pour, something):
         global flow_meter
         label.text="[size=60]%.1f of %s oz\ndispensed[/size]"%(flow_meter, pour)
-
-
-class IncrediblyCrudeClock(Label):
-    a = NumericProperty(60)  # seconds
-
-    def start(self):
-        Animation.cancel_all(self)  # stop any current animations
-        self.anim = Animation(a=0, duration=self.a)
-        def finish_callback(animation, incr_crude_clock):
-            incr_crude_clock.text = "FINISHED"
-        self.anim.bind(on_complete=finish_callback)
-        self.anim.start(self)
-
-    def on_a(self, instance, value):
-        self.text = 'Please make a payment.\n  You have ' + str(floor(value)) + ' seconds.'
 
 
 class SimpleKivy(App):
