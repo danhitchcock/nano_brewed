@@ -1,22 +1,16 @@
-import os
 import time
 from kivy.app import App
-from math import ceil, floor
 from kivy.uix.label import Label
 from kivy.core.image import Image as CoreImage
 from kivy.uix.image import Image
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.floatlayout import FloatLayout
-from kivy.animation import Animation
-from kivy.properties import StringProperty, NumericProperty
-from kivy.uix.textinput import TextInput
-from kivy.graphics import Rectangle, Color
 from kivy.uix.button import Button
 from kivy.clock import Clock
 from functools import partial
 from io import BytesIO
 from kivy.config import Config
-from rpc_bindings import send, open_account, generate_account, generate_qr, nano_to_raw, receive_all, send_all, check_balance
+from rpc_bindings import open_account, generate_account, generate_qr, nano_to_raw, receive_all, send_all, check_balance
 
 # this file will contain your account name. I left it intentionally missing from the repo
 with open('my_account.txt') as f:
@@ -146,15 +140,31 @@ payment = False
 
 # config for hte kivy app. If it's not on the raspberry pi, don't activate GPIO, and use a timer to simulate the
 # flowmeter
-flow_meter_channel = 4
+
 
 # when the flow meter is being monitored, it is looking for a chance from True to False for a 'click'
 flow_pin_was_on = False
+tap_to_flowmeter_gpio = {
+    1: 4,
+    2: 17
+}
+valve_number_to_gpio = {
+    1: 18,
+    2: 23,
+    3: 24,
+    4: 25
+}
 try:
     import RPi.GPIO as GPIO
     import time
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(flow_meter_channel, GPIO.IN)
+    for key in tap_to_flowmeter_gpio:
+        GPIO.setup(tap_to_flowmeter_gpio[key], GPIO.IN)
+
+
+    for key in valve_number_to_gpio:
+        GPIO.setup(valve_number_to_gpio[key], GPIO.OUT)
+        GPIO.output(valve_number_to_gpio[key], False)
     raspberry_pi = True
 except:
     raspberry_pi = False
@@ -168,17 +178,23 @@ callback_test_time = .1
 
 t0 = 0
 times = []
+flow_meter_channel = 4
 
 
 class LoginScreen(GridLayout):
     def __init__(self, **kwargs):
+        super(LoginScreen, self).__init__(**kwargs)
+        self.MainMenu()
+
+    def MainMenu(self, dummy=None):
+        print(self, dummy)
         #self.size = (800, 480)
         global beer_list
         global flow_meter
         global flow_pin_was_on
         flow_pin_was_on = False
         flow_meter = 0
-        super(LoginScreen, self).__init__(**kwargs)
+
         self.clear_widgets(self.children)
         self.cols = 2
 
@@ -235,8 +251,6 @@ class LoginScreen(GridLayout):
         self.add_widget(btn3)
         self.add_widget(btn4)
 
-    def MainMenu(self, value):
-        self.__init__()
 
     def BeerDescript(self, value):
         self.cols = 2
@@ -341,6 +355,9 @@ class LoginScreen(GridLayout):
         self.clear_widgets(self.children)
         global flow_meter
         global t0
+        # turn our GPIO on!
+        if raspberry_pi:
+            GPIO.output(valve_number_to_gpio[props["Valve Number"]], True)
         t0=0
         flow_meter = 0
         label = Label(markup=True, halign='center', valign='center')
@@ -354,9 +371,10 @@ class LoginScreen(GridLayout):
 
     def ThankYou(self, value):
         global times
-        print(times[:30])
+        #print('FPS', times[:30])
         self.clear_widgets(self.children)
         self.add_widget(Label(text="[size=60]Thank you![/size]", markup=True, valign='center', halign='center'))
+        #event = Clock.schedule_once(partial(self.MainMenu), 2)
         event = Clock.schedule_once(self.MainMenu, 2)
 
     def CheckFlowMeter(self, event, props, pour, something):
@@ -364,22 +382,21 @@ class LoginScreen(GridLayout):
         global t0
         global times
         global flow_pin_was_on
-        global flow_meter_channel
         new_time = time.time()
         times.append(1/(t0-new_time))
         t0 = new_time
         if raspberry_pi:
-            flow_pin_currently_on = GPIO.input(flow_meter_channel)
+            flow_pin_currently_on = GPIO.input(tap_to_flowmeter_gpio[props["Tap Number"]])
             if flow_pin_currently_on and not flow_pin_was_on:
                 flow_meter += 0.075142222
             flow_pin_was_on = flow_pin_currently_on
         else:
             flow_meter += 1 / 20
 
-
-
         if flow_meter >= int(pour):
             event.cancel()
+            if raspberry_pi:
+                GPIO.output(valve_number_to_gpio[props["Valve Number"]], False)
             self.ThankYou(None)
             return False
 
