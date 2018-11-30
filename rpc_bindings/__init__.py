@@ -186,7 +186,7 @@ def get_pending(account, count=-1):
     return perform_curl(data)
 
 
-def generate_qr(account, amount=0):
+def generate_qr(account, amount=0, fill_color="black", back_color="white"):
     account_amount = 'xrb:%s?amount=%s' % (account, amount)
     qr = qrcode.QRCode(
         version=1,
@@ -195,7 +195,7 @@ def generate_qr(account, amount=0):
         border=4,
     )
     qr.add_data(account_amount)
-    img = qr.make_image(fill_color='black', back_color='white')
+    img = qr.make_image(fill_color=fill_color, back_color=back_color)
     return img
 
 
