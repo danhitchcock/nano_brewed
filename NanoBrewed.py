@@ -181,28 +181,37 @@ times = []
 flow_meter_channel = 4
 
 
-class LoginScreen(GridLayout):
+class LoginScreen(FloatLayout):
     def __init__(self, **kwargs):
+        #self.cols = 1
         super(LoginScreen, self).__init__(**kwargs)
-        self.MainMenu()
+        splash = Image(source='images/splash.png', pos_hint={'x': 0, 'y': 0}, size_hint=(1, 1))
+        self.add_widget(splash)
+
+        Clock.schedule_once(self.MainMenu, 5)
+
 
     def MainMenu(self, dummy=None):
-        print(self, dummy)
+        self.clear_widgets(self.children)
         #self.size = (800, 480)
         global beer_list
         global flow_meter
         global flow_pin_was_on
         flow_pin_was_on = False
         flow_meter = 0
-
         self.clear_widgets(self.children)
-        self.cols = 2
+        splash = Image(source='images/splash.png', pos_hint={'x': 0, 'y': 0}, size_hint=(1, 1))
+        self.add_widget(splash)
+
+        main_grid = GridLayout()
+        main_grid.cols = 2
 
         tap_num = 1
-        btn1 = Button(background_normal='',
-                      markup=True,
+        btn1 = Button(markup=True,
                       halign='center',
-                      background_color=beer_list[tap_num]['BG_Color'],
+                      background_color=(1, 1, 1, 0),
+                      #background_normal='/images/splash.png',
+                      #background_down='/images/splash.png',
                       text="[size=60]" + beer_list[tap_num]['Name'] +'[/size]\n' +
                             '[size=25]' + beer_list[tap_num]['Style'] + '\n' +
                            'ABV: %s%% | IBU: %s' % (beer_list[tap_num]['ABV'], beer_list[tap_num]['IBU']) +'[/size]'
@@ -210,11 +219,14 @@ class LoginScreen(GridLayout):
         btn1.props = beer_list[tap_num]
         btn1.bind(on_release=self.BeerDescript)
 
+        #splash = Image(source='images/splash.png', pos_hint={'x': 0, 'y': 0}, size_hint=(4, 4))
+        #btn1.add_widget(splash)
+
         tap_num = 2
         btn2 = Button(background_normal='',
                       markup=True,
                       halign='center',
-                      background_color=beer_list[tap_num]['BG_Color'],
+                      background_color=(1, 1, 1, 0),
                       text="[size=60]" + beer_list[tap_num]['Name'] +'[/size]\n' +
                             '[size=25]' + beer_list[tap_num]['Style'] + '\n' +
                            'ABV: %s%% | IBU: %s' % (beer_list[tap_num]['ABV'], beer_list[tap_num]['IBU']) +'[/size]'
@@ -226,7 +238,7 @@ class LoginScreen(GridLayout):
         btn3 = Button(background_normal='',
                       markup=True,
                       halign='center',
-                      background_color=beer_list[tap_num]['BG_Color'],
+                      background_color=(1, 1, 1, 0),
                       text="[size=60]" + beer_list[tap_num]['Name'] +'[/size]\n' +
                             '[size=25]' + beer_list[tap_num]['Style'] + '\n' +
                            'ABV: %s%% | IBU: %s' % (beer_list[tap_num]['ABV'], beer_list[tap_num]['IBU']) +'[/size]'
@@ -238,7 +250,7 @@ class LoginScreen(GridLayout):
         btn4 = Button(background_normal='',
                       markup=True,
                       halign='center',
-                      background_color=beer_list[tap_num]['BG_Color'],
+                      background_color=(1, 1, 1, 0),
                       text="[size=60]" + beer_list[tap_num]['Name'] +'[/size]\n' +
                             '[size=25]' + beer_list[tap_num]['Style'] + '\n' +
                            'ABV: %s%% | IBU: %s' % (beer_list[tap_num]['ABV'], beer_list[tap_num]['IBU']) +'[/size]'
@@ -246,10 +258,11 @@ class LoginScreen(GridLayout):
         btn4.props = beer_list[tap_num]
         btn4.bind(on_release=self.BeerDescript)
 
-        self.add_widget(btn1)
-        self.add_widget(btn2)
-        self.add_widget(btn3)
-        self.add_widget(btn4)
+        main_grid.add_widget(btn1)
+        main_grid.add_widget(btn2)
+        main_grid.add_widget(btn3)
+        main_grid.add_widget(btn4)
+        self.add_widget(main_grid)
 
 
     def BeerDescript(self, value):
@@ -312,7 +325,7 @@ class LoginScreen(GridLayout):
 
 
         #self.add_widget(Button(text='You have 30 seconds to purchase %s'%value.text[9:], id='btn1'))
-        layout_layer = FloatLayout()
+
         #crudeclock = IncrediblyCrudeClock(pos_hint={'x': 0, 'y': -.4})
         amount = Label(text="%s\n%s oz\n%s Nano\nTap %s"%(props['Name'], props['Pour'], props['Cost']/10**30, props['Tap Number']),
                        pos_hint={'x':0, 'y':.37},
@@ -321,6 +334,7 @@ class LoginScreen(GridLayout):
         qr_code = Image(texture=img.texture, pos_hint={'x': .25, 'y': .2}, size_hint=(.5, .5))
 
         #layout_layer.add_widget(crudeclock)
+        layout_layer = FloatLayout()
         layout_layer.add_widget(qr_code)
         layout_layer.add_widget(amount)
         self.add_widget(layout_layer)
