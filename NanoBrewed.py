@@ -199,8 +199,8 @@ class LoginScreen(FloatLayout):
         global flow_meter
         global flow_pin_was_on
         flow_pin_was_on = False
-        flow_meter = 0
-        self.clear_widgets(self.children)
+        flow_meter = -1
+        self.add_widget(Image(source='images/button_background.png'))
         #splash = Image(source='images/splash.png', pos_hint={'x': 0, 'y': 0}, size_hint=(1, 1))
         #self.add_widget(splash)
 
@@ -208,7 +208,26 @@ class LoginScreen(FloatLayout):
         main_grid.cols = 2
 
         tap_num = 1
-        btn1 = Button(background_color=(51 / 255, 51 / 255, 51 / 255, 1),
+        btn1 = Button(background_color=(51 / 255, 51 / 255, 51 / 255, 0),
+                      background_normal='',
+                      background_down='',
+                      markup=True,
+                      halign='center',
+                      text="[size=50][font=fonts/BEER.TTF]" + beer_list[tap_num]['Name'] +'[/font][/size]\n' +
+                            '[size=25]' + beer_list[tap_num]['Style'] + '\n' +
+                           'ABV: %s%% | IBU: %s' % (beer_list[tap_num]['ABV'], beer_list[tap_num]['IBU']) +'[/size]',
+                      font_name="fonts/Clicker - Regular.ttf",
+                      color=(51 / 255, 51 / 255, 51 / 255),
+
+                      )
+        btn1.props = beer_list[tap_num]
+        btn1.bind(on_release=self.BeerDescript)
+
+        #splash = Image(source='images/splash.png', pos_hint={'x': 0, 'y': 0}, size_hint=(4, 4))
+        #btn1.add_widget(splash)
+
+        tap_num = 2
+        btn2 = Button(background_color=(250 / 255, 175 / 255, 64 / 255, 0),
                       background_normal='',
                       background_down='',
                       markup=True,
@@ -219,45 +238,12 @@ class LoginScreen(FloatLayout):
                       font_name="fonts/Clicker - Regular.ttf",
                       color=(250 / 255, 175 / 255, 64 / 255),
                       )
-        btn1.props = beer_list[tap_num]
-        btn1.bind(on_release=self.BeerDescript)
-
-        #splash = Image(source='images/splash.png', pos_hint={'x': 0, 'y': 0}, size_hint=(4, 4))
-        #btn1.add_widget(splash)
-
-        tap_num = 2
-        btn2 = Button(background_color=(250 / 255, 175 / 255, 64 / 255, 1),
-                      background_normal='',
-                      background_down='',
-                      markup=True,
-                      halign='center',
-                      text="[size=50][font=fonts/BEER.TTF]" + beer_list[tap_num]['Name'] +'[/font][/size]\n' +
-                            '[size=25]' + beer_list[tap_num]['Style'] + '\n' +
-                           'ABV: %s%% | IBU: %s' % (beer_list[tap_num]['ABV'], beer_list[tap_num]['IBU']) +'[/size]',
-                      font_name="fonts/Clicker - Regular.ttf",
-                      color=(51 / 255, 51 / 255, 51 / 255),
-                      )
         btn2.props = beer_list[tap_num]
         btn2.bind(on_release=self.BeerDescript)
 
         tap_num = 3
-        btn3 = Button(background_color=(250 / 255, 175 / 255, 64 / 255, 1),
+        btn3 = Button(background_color=(250 / 255, 175 / 255, 64 / 255, 0),
                       background_normal='',
-                      background_down='',
-                      markup=True,
-                      halign='center',
-                      text="[size=50][font=fonts/BEER.TTF]" + beer_list[tap_num]['Name'] +'[/font][/size]\n' +
-                            '[size=25]' + beer_list[tap_num]['Style'] + '\n' +
-                           'ABV: %s%% | IBU: %s' % (beer_list[tap_num]['ABV'], beer_list[tap_num]['IBU']) +'[/size]',
-                      font_name="fonts/Clicker - Regular.ttf",
-                      color=(51 / 255, 51 / 255, 51 / 255),
-                      )
-        btn3.props = beer_list[tap_num]
-        btn3.bind(on_release=self.BeerDescript)
-
-        tap_num = 4
-        btn4 = Button(background_color=(51 / 255, 51 / 255, 51 / 255, 1),
-                      background_normal='#ffffff',
                       background_down='',
                       markup=True,
                       halign='center',
@@ -266,6 +252,22 @@ class LoginScreen(FloatLayout):
                            'ABV: %s%% | IBU: %s' % (beer_list[tap_num]['ABV'], beer_list[tap_num]['IBU']) +'[/size]',
                       font_name="fonts/Clicker - Regular.ttf",
                       color=(250 / 255, 175 / 255, 64 / 255, 1),
+                      )
+        btn3.props = beer_list[tap_num]
+        btn3.bind(on_release=self.BeerDescript)
+
+        tap_num = 4
+        btn4 = Button(background_color=(51 / 255, 51 / 255, 51 / 255, 0),
+                      background_normal='#ffffff',
+                      background_down='',
+                      markup=True,
+                      halign='center',
+                      text="[size=50][font=fonts/BEER.TTF]" + beer_list[tap_num]['Name'] +'[/font][/size]\n' +
+                            '[size=25]' + beer_list[tap_num]['Style'] + '\n' +
+                           'ABV: %s%% | IBU: %s' % (beer_list[tap_num]['ABV'], beer_list[tap_num]['IBU']) +'[/size]',
+                      font_name="fonts/Clicker - Regular.ttf",
+                      color=(51 / 255, 51 / 255, 51 / 255),
+
                       )
         btn4.props = beer_list[tap_num]
         btn4.bind(on_release=self.BeerDescript)
@@ -278,44 +280,48 @@ class LoginScreen(FloatLayout):
 
 
     def BeerDescript(self, value):
+
         self.cols = 2
         self.clear_widgets(self.children)
+        self.add_widget(Image(source='images/background.png'))
         left_float = FloatLayout()
         left_float.add_widget(
             Label(text=value.props['Name'].replace('\n', ' '),
-                  font_size=40,
+                  font_size=45,
                   pos_hint={'x': 0, 'top': 1.4},
                   font_name="fonts/BEER.TTF",
-                  color=(51 / 255, 51 / 255, 51 / 255, 1)
+                  color=(51 / 255, 51 / 255, 51 / 255, 1),
+
                   )
         )
 
         left_float.add_widget(
             Label(
-                text="[size=35]%soz - %.0f Chips[/size]\n(%s Stones, %s Nano)\nABV: %s%%\n%s IBU\nMalts: %s\nHops: %s\n\n%s\n\nTap Number: %s"%(
+                text="[size=35]%sOZ %.0f CHIPS[/size][size=17]\n(%s STONES, %s NANO)\nABV: %s%%\n%s IBU\nMALTS: %s\nHOPS: %s\n\n%s\n\nTAP NUMBER: %s[/size]"%(
                     value.props['Pour'], value.props['Cost']/(10**25), value.props['Cost']/(10**28), value.props['Cost']/(10**30),value.props['ABV'],
                     value.props['IBU'], value.props['Malts'], value.props['Hops'], value.props['Description'],
                     value.props['Tap Number']),
                 markup=True,
-                text_size=(left_float.width*3.5, None),
-                pos_hint={'x': -.25, 'top': .95},
-                  font_name="fonts/Clicker - Regular.ttf",
-                  color=(51 / 255, 51 / 255, 51 / 255, 1)
+                text_size=(left_float.width*4, None),
+                pos_hint={'x': -.2, 'top': .95},
+                font_name="fonts/Clicker - Regular.ttf",
+                color=(51 / 255, 51 / 255, 51 / 255, 1),
                 ))
         #right_float = FloatLayout()
 
         beer_img = Image(
-            source='images/download.jpg',
+            source='images/beer100.png',
             size=(.5, .5),
-            pos_hint={'x': .2, 'top': 1.2}
+            pos_hint={'x': .27, 'top': 1.2}
         )
 
         btn2 = Button(text='PURCHASE',
                       font_size=45,
                       size_hint=(.4, .2),
-                      pos_hint={'x': .5, 'top': .5},
+                      pos_hint={'x': .57, 'top': .5},
                       background_color=(51 / 255, 51 / 255, 51 / 255, 1),
                       color=(250 / 255, 175 / 255, 64 / 255, 1),
+                      background_normal='',
                       font_name="fonts/Clicker - Regular.ttf",
                       )
         btn2.props = value.props
@@ -325,8 +331,9 @@ class LoginScreen(FloatLayout):
         btn1 = Button(text='MENU',
                       font_size=45,
                       size_hint=(.4, .2),
-                      pos_hint={'x': .5, 'top': .25},
+                      pos_hint={'x': .57, 'top': .25},
                       background_color=(51 / 255, 51 / 255, 51 / 255, 1),
+                      background_normal = '',
                       color=(250 / 255, 175 / 255, 64 / 255, 1),
                       font_name="fonts/Clicker - Regular.ttf",
                       )
@@ -341,8 +348,8 @@ class LoginScreen(FloatLayout):
     def QRScreen(self, value):
         global payment
         self.clear_widgets(self.children)
-        splash = Image(source='images/splash.png', pos_hint={'x': 0, 'y': 0}, size_hint=(1, 1))
-        self.add_widget(splash)
+        self.add_widget(Image(source='images/background.png'))
+
         #self.cols = 1
 
         props = value.props
@@ -393,6 +400,7 @@ class LoginScreen(FloatLayout):
         else:
             Clock.schedule_once(partial(self.PaymentReceived, props), 3)
 
+
     def CheckPayment(self, props, something):
         global payment
         if payment:
@@ -406,8 +414,10 @@ class LoginScreen(FloatLayout):
         else:
             return True
 
+
     def PaymentReceived(self, props, dummy):
         self.clear_widgets(self.children)
+        self.add_widget(Image(source='images/background.png'))
         #print(props)
         self.add_widget(
             Label(
@@ -421,23 +431,25 @@ class LoginScreen(FloatLayout):
         )
         event = Clock.schedule_once(partial(self.Dispensing, props), 1)
 
+
     def Dispensing(self, props, value):
         self.clear_widgets(self.children)
+        self.add_widget(Image(source='images/background.png'))
         global flow_meter
         global t0
         # turn our GPIO on!
         if raspberry_pi:
             GPIO.output(valve_number_to_gpio[props["Valve Number"]], True)
         t0=0
-        flow_meter = 0
-        img = Image(source='images/download.jpg')
+        flow_meter = -1
+        img = Image(source='images/beer0.png')
         title = Label(markup=True,
                       font_size=55,
                       halign='center',
                       pos_hint ={'top':1.35},
                       color=(51 / 255, 51 / 255, 51 / 255, 1),
                       font_name='fonts/Clicker - Regular.ttf',
-                      text='[font=fonts/BEER.TTF]%s[/font]\nTAP NUMBER %s'%(props['Name'], props['Tap Number']),
+                      text='[font=fonts/BEER.TTF]%s[/font]\nTAP NUMBER %s'%(props['Name'].replace('\n', ''), props['Tap Number']),
                       )
 
         label = Label(markup=True,
@@ -453,16 +465,18 @@ class LoginScreen(FloatLayout):
 
         event = Clock.schedule_interval(
             partial(self.update_label, label, img, props['Pour']),
-            1/5)
+            1/15)
 
 
         event2 = Clock.schedule_interval(partial(self.CheckFlowMeter, event, props, props['Pour']), 1/75)
         #event = Clock.schedule_once(self.ThankYou, 10)
 
+
     def ThankYou(self, value):
         global times
         #print('FPS', times[:30])
         self.clear_widgets(self.children)
+        self.add_widget(Image(source='images/background.png'))
         self.add_widget(
             Label(
                 text="[size=100][font=fonts/Clicker - Regular.ttf]ENJOY![/font][/size]",
@@ -474,6 +488,7 @@ class LoginScreen(FloatLayout):
         )
         #event = Clock.schedule_once(partial(self.MainMenu), 2)
         event = Clock.schedule_once(self.MainMenu, 2)
+
 
     def CheckFlowMeter(self, event, props, pour, something):
         global flow_meter
@@ -501,20 +516,27 @@ class LoginScreen(FloatLayout):
 
     def update_label(self, label, img, pour, something):
         label.text = "[size=60]%.1f OF %s OZ\nDISPENSED[/size]"%(flow_meter, pour)
-        if (flow_meter/pour) < .15:
+        if (flow_meter/pour) < .1:
             img.source = 'images/beer0.png'
-        if .15 <= (flow_meter/pour) < .3:
-            img.source = 'images/beer15.png'
-        if .3 <= (flow_meter/pour) < .45:
+        if .1 <= (flow_meter/pour) < .2:
+            img.source = 'images/beer10.png'
+        if .2 <= (flow_meter/pour) < .3:
+            img.source = 'images/beer20.png'
+        if .3 <= (flow_meter/pour) < .4:
             img.source = 'images/beer30.png'
-        if .45 <= (flow_meter/pour) < .6:
-            img.source = 'images/beer45.png'
-        if .6 <= (flow_meter/pour) < .75:
+        if .4 <= (flow_meter/pour) < .5:
+            img.source = 'images/beer40.png'
+        if .5 <= (flow_meter/pour) < .6:
+            img.source = 'images/beer50.png'
+        if .6 <= (flow_meter/pour) < .7:
             img.source = 'images/beer60.png'
-        if .75 <= (flow_meter/pour) < 90:
-            img.source = 'images/beer75.png'
+        if .7 <= (flow_meter/pour) < .8:
+            img.source = 'images/beer70.png'
+        if .8 <= (flow_meter/pour) < .9:
+            img.source = 'images/beer80.png'
         if .9 <= (flow_meter/pour):
             img.source = 'images/beer90.png'
+
 
 
 class SimpleKivy(App):
