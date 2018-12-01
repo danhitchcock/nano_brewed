@@ -211,3 +211,51 @@ def nano_to_raw(amount):
 
 def raw_to_nano(amount):
     return amount/10**30
+
+def process_payments(transaction_history, receiving_account):
+    # this file will contain your account name. I left it intentionally missing from the repo
+    with open(receiving_account) as f:
+        for line in f:
+            my_account = line
+
+    # houses the transaction history from the kivy app. It's crude and unencrypted.
+    with open(transaction_history, 'r') as f:
+        accounts = []
+        keys = []
+        for i, line in enumerate(f):
+            # print(i, line)
+            if i % 2 == 0:
+                accounts.append(line.replace(' ', '').replace('\n', ''))
+            else:
+                keys.append(line.replace(' ', '').replace('\n', ''))
+
+    # open accounts or receive from transaction history
+    for account, key in zip(accounts, keys):
+        try:
+            hash = open_account(account, key)
+            if hash == "Previous block exists. Use receive.":
+                pass
+            else:
+                print('%s opened' % account)
+        except:
+            pass
+            # print('nothing to open for %s' % account)
+        try:
+            received = receive_all(account, key)
+            if received != "No Pending Transactions.":
+                print('%s received' % account)
+        except:
+            # print('nothing to receive for %s' % account)
+            pass
+
+    # send all nanos back to your wallet in 'my_account.txt'
+    for account, key in zip(accounts, keys):
+        try:
+            sent = send_all(account, key, my_account)
+            if sent:
+                print('%s sent to %s' % (account, my_account))
+            else:
+                pass
+        except:
+            pass
+            # print('nothing to send for %s' % account)

@@ -11,55 +11,10 @@ from kivy.utils import rgba
 from functools import partial
 from io import BytesIO
 from kivy.config import Config
-from rpc_bindings import open_account, generate_account, generate_qr, nano_to_raw, receive_all, send_all, check_balance
+from rpc_bindings import open_account, generate_account, generate_qr, nano_to_raw, receive_all, send_all, check_balance, process_payments
 
-# this file will contain your account name. I left it intentionally missing from the repo
-with open('my_account.txt') as f:
-    for line in f:
-        my_account = line
-"""
-# houses the transaction history from the kivy app. It's crude and unencrypted.
-with open('transaction_history.txt', 'r') as f:
-    accounts = []
-    keys = []
-    for i, line in enumerate(f):
-        # print(i, line)
-        if i % 2 == 0:
-            accounts.append(line.replace(' ', '').replace('\n', ''))
-        else:
-            keys.append(line.replace(' ', '').replace('\n', ''))
+process_payments('transaction_history.txt', 'my_account.txt')
 
-# open accounts or receive from transaction history
-for account, key in zip(accounts, keys):
-    try:
-        hash = open_account(account, key)
-        if hash == "Previous block exists. Use receive.":
-            pass
-        else:
-            print('%s opened'%account)
-    except:
-        pass
-        # print('nothing to open for %s' % account)
-    try:
-        received = receive_all(account, key)
-        if received !="No Pending Transactions.":
-            print('%s received'%account)
-    except:
-        # print('nothing to receive for %s' % account)
-        pass
-
-# send all nanos back to your wallet in 'my_account.txt'
-for account, key in zip(accounts, keys):
-    try:
-        sent = send_all(account, key, my_account)
-        if sent:
-            print('%s sent to %s'%(account, my_account))
-        else:
-            pass
-    except:
-        pass
-        #print('nothing to send for %s' % account)
-"""
 # the beers. has beer information and keg information
 # the tap number will determine which flow_meter to use
 # the valve number controls whichever valve
@@ -137,7 +92,7 @@ beer_list = {
 }
 
 # do we want to accept payment?
-payment = False
+payment = True
 
 # config for hte kivy app. If it's not on the raspberry pi, don't activate GPIO, and use a timer to simulate the
 # flowmeter
@@ -189,7 +144,7 @@ class LoginScreen(FloatLayout):
         splash = Image(source='images/splash.png', pos_hint={'x': 0, 'y': 0}, size_hint=(1, 1))
         self.add_widget(splash)
 
-        Clock.schedule_once(self.MainMenu, 5)
+        Clock.schedule_once(self.MainMenu, 7)
 
 
     def MainMenu(self, dummy=None):
@@ -504,7 +459,7 @@ class LoginScreen(FloatLayout):
                 flow_meter += 0.075142222
             flow_pin_was_on = flow_pin_currently_on
         else:
-            flow_meter += 1 / 20
+            flow_meter += 1 / 50
 
         if flow_meter >= int(pour):
             event.cancel()
