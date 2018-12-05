@@ -1,6 +1,7 @@
 # NanoBrewed
 ![alt text](https://github.com/nanobrewed/nano_brewed/blob/master/images/splash.png)
-*all images designed by Chris Seero*
+
+*all images and graphics were designed by a friend, Chris Seero*
 
 Two taps, four beers, (soon...) one cryptocurrency.
 
